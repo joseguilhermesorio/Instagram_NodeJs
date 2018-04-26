@@ -17,6 +17,32 @@
 		<script>
 			$(document).ready(function(){
 
+				function carrega_postagem(){
+					var xhr = new XMLHttpRequest();
+					xhr.open("GET","http://localhost:5000/api");
+
+					xhr.onload = function(){
+						if(xhr.status === 200){
+							var data = $.parseJSON(xhr.responseText);
+
+							for(i = 0; i < data.length; i++){
+								$("#container_timeline").append(
+									"<div class='publicacao'>"+
+										"<span class='titulo'>" +
+											data[i].titulo +
+										"</span>"+
+										'<img src="http://localhost:5000/api/uploads/'+data[i].url_img+'" />' +
+									"</div>"
+								);
+							}
+						}
+					}
+
+					xhr.send();
+				}
+
+				carrega_postagem();
+
 				$('#btn_incluir').click(function(){
 					$('#container_timeline').hide();
 					$('#container_form').show();
@@ -44,7 +70,7 @@
 					//verificar as mudancas de estado
 					xhr.onreadystatechange = function(){
 						if(xhr.readyState == 4){
-							var resposta = xhr.responseText;
+							var resposta = "<div class='alert alert-success'>Dados inseridos com sucesso </div>";
 							document.getElementById("mensagem").innerHTML = resposta;
 						}
 					}

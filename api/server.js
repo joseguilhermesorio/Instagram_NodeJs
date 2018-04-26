@@ -39,36 +39,46 @@ app.post('/api',function(req,res){
 
   res.setHeader("Access-Control-Allow-Origin","*");
 
-  const dados = req.body;
+  var data = new Date();
+  var time_stamp = data.getTime();
+  var url_img = time_stamp + '_'+ req.files.arquivo.originalFilename;
 
-  console.log(req.files)
-  // var path_destino = './uploads/' + req.files.arquivo.originalFilename;
-  //
-  // fs.rename("./tmp/", path_destino, function(err){
-  //   if(err){
-  //     res.status(500).json({error: err});
-  //     return;
-  //   }
+  var path_origem = req.files.arquivo.path;
+  var path_destino = './uploads/' + url_img;
 
-    // db.open(function(err,mongoclient){
-    //   mongoclient.collection('postagens',function(err,collection){
-    //     collection.insert(dados,function(err,results){
-    //       if(err){
-    //         res.json(err);
-    //       }
-    //       else{
-    //         res.json(results);
-    //       }
-    //
-    //       mongoclient.close();
-    //     });
-    //   });
-    // });
-   // });
+  fs.rename(path_origem, path_destino, function(err){
+     if(err){
+      res.status(500).json({error: err});
+      return;
+  }
+
+  var dados = {
+    url_img: url_img,
+    titulo: req.body.titulo
+  }
+
+    db.open(function(err,mongoclient){
+      mongoclient.collection('postagens',function(err,collection){
+         collection.insert(dados,function(err,results){
+           if(err){
+             res.json(err);
+          }
+          else{
+             res.json(results);
+          }
+
+         mongoclient.close();
+        });
+      });
+     });
+    });
 });
 
 //Consultar dados da api
 app.get('/api',function(req,res){
+
+  res.setHeader("Access-Control-Allow-Origin","*");
+
   db.open(function(err,mongoclient){
     mongoclient.collection("postagens",function(err,collection){
       collection.find().toArray(function(err,results){
